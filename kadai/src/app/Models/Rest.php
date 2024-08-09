@@ -10,7 +10,7 @@ class Rest extends Model
     use HasFactory;
 
     protected $fillable = [
-        'date',
+     /*   'date', */
         'break_start',
         'break_end'
     ];

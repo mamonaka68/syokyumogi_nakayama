@@ -9,25 +9,16 @@ use App\Models\Work;
 use App\Models\Rest;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 
 class RegisterUserController extends Controller
 {
     public function index(){
-        return view('index');
-    } 
-
-    public function create(Request $request){
-        $form = $request->all();
-        return redirect('/');
-    }
-
-    public function punch()
-    {
         $now_date = Carbon::now()->format('Y-m-d');
         $user_id = Auth::user()->id;
         $confirm_date = Work::where('user_id', $user_id)
-            ->where('date', $now_date)
+            ->where('work_date', $now_date)
             ->first();
 
         if (!$confirm_date) {
@@ -37,6 +28,32 @@ class RegisterUserController extends Controller
         }
         return view('index', compact('status'));
     }
+
+    public function indicate(){
+        return view('register');
+    }
+
+    public function create(Request $request){
+        $form = $request->all();
+    /*    Registeruser::create($form);*/
+        return redirect('/');
+    }
+
+   /*  public function punch()
+    {
+        $now_date = Carbon::now()->format('Y-m-d');
+        $user_id = Auth::user()->id;
+        $confirm_date = Work::where('user_id', $user_id)
+            ->where('work_date', $now_date)
+            ->first();
+
+        if (!$confirm_date) {
+            $status = 0;
+        } else {
+            $status = Auth::user()->status;
+        }
+        return view('index', compact('status'));
+    }  */
 
     public function work(Request $request)
     {
@@ -94,5 +111,36 @@ class RegisterUserController extends Controller
 
         return redirect('/')->with(compact('status'));
         //return redirect('/');
+    }
+
+    public function indexDate(Request $request)
+    {
+        $displayDate = Carbon::now();
+
+        $users = DB::table('attendance_view_table')
+            ->whereDate('work_date', $displayDate)
+            ->paginate(5);
+
+        return view('attendance_date', compact('users', 'displayDate'));
+    }
+
+    // 日別一覧 / 抽出処理
+    public function perDate(Request $request)
+    {
+        $displayDate = Carbon::parse($request->input('displayDate'));
+
+        if ($request->has('prevDate')) {
+            $displayDate->subDay();
+        }
+
+        if ($request->has('nextDate')) {
+            $displayDate->addDay();
+        }
+
+        $users = DB::table('attendance_view_table')
+            ->whereDate('work_date', $displayDate)
+            ->paginate(5);
+
+        return view('attendance_date', compact('users', 'displayDate'));
     }
 }
