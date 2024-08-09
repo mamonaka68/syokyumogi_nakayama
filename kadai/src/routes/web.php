@@ -21,8 +21,8 @@ use Illuminate\Support\Facades\Route;
 
 
 
-Route::get('/',[RegisterUserController::class,'punch'])
- ->middleware('auth','verified');
+/* Route::get('/',[RegisterUserController::class,'punch'])
+ ->middleware('auth','verified'); */
 
 Route::post('/', [RegisterUserController::class, 'create']);
 Route::middleware('auth')->group(function () {
@@ -34,3 +34,8 @@ Route::get('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 Route::post('/work', [RegisterUserController::class, 'work'])
     ->name('work');
+
+Route::get('/attendance/date', [RegisterUserController::class, 'indexDate'])
+    ->name('attendance/date'); 
+Route::post('/attendance/date', [RegisterUserController::class, 'perDate'])
+    ->name('per/date');
